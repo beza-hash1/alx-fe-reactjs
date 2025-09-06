@@ -1,4 +1,5 @@
-export default function WelcomeMessage() {
+
+export default function Welcome() {
   return (
     <div>
       <h1>Hello everyone, I am learning React at ALX!</h1>
