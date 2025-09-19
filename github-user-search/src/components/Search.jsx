@@ -1,67 +1,98 @@
 import React, { useState } from 'react'
-import { fetchUserData } from '../services/githubService'
-
+import { searchUsersAdvanced } from '../services/githubService'
 
 export default function Search() {
-  const [text, setText] = useState('')
-  const [user, setUser] = useState(null)
+  const [username, setUsername] = useState('')
+  const [location, setLocation] = useState('')
+  const [minRepos, setMinRepos] = useState(0)
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   async function submit(e) {
     e.preventDefault()
+    setLoading(true)
     setError(null)
-    setUser(null)
+    setUsers([])
 
-    const username = text.trim()
-    if (!username) {
+    if (!username.trim()) {
       setError('Please enter a username')
+      setLoading(false)
       return
     }
 
-    setLoading(true)
     try {
-      const data = await fetchUserData(username)
-      setUser(data)
+      const results = await searchUsersAdvanced({
+        username,
+        location,
+        minRepos: Number(minRepos),
+        per_page: 12,
+      })
+
+      if (results.length === 0) {
+        setError('Looks like we cant find any users')
+      } else {
+        setUsers(results)
+      }
     } catch (err) {
-      setError('Looks like we cant find the user')
+      setError(err.message || 'Looks like we cant find any users')
     } finally {
       setLoading(false)
     }
   }
 
   function clearAll() {
-    setText('')
-    setUser(null)
+    setUsername('')
+    setLocation('')
+    setMinRepos(0)
+    setUsers([])
     setError(null)
   }
 
   return (
     <div>
-      <form onSubmit={submit} className="search-form" role="search" aria-label="Search GitHub user">
+      <form onSubmit={submit} className="search-form" role="search">
         <input
-          type="search"
-          placeholder="Enter GitHub username (e.g. octocat)"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          aria-label="GitHub username"
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          aria-label="Username"
+        />
+        <input
+          type="text"
+          placeholder="Location (optional)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          aria-label="Location"
+        />
+        <input
+          type="number"
+          placeholder="Min Repos"
+          value={minRepos}
+          onChange={(e) => setMinRepos(e.target.value)}
+          aria-label="Minimum repositories"
+          min="0"
         />
         <button type="submit">Search</button>
         <button type="button" onClick={clearAll}>Clear</button>
       </form>
 
       {loading && <p>Loading...</p>}
-
       {error && <p className="error">{error}</p>}
 
-      {user && (
-        <div className="user-card" style={{ marginTop: 12 }}>
-          <img src={user.avatar_url} alt={`${user.login} avatar`} width="100" />
-          <h3>{user.name ? user.name : user.login}</h3>
-          {user.bio && <p>{user.bio}</p>}
-          <p>
-            <a href={user.html_url} target="_blank" rel="noopener noreferrer">View Profile on GitHub</a>
-          </p>
+      {users.length > 0 && (
+        <div className="users-grid">
+          {users.map((user) => (
+            <div key={user.id} className="user-card">
+              <img src={user.avatar_url} alt={`${user.login} avatar`} width="100" />
+              <h3>{user.login}</h3>
+              <p>Type: {user.type}</p>
+              <a href={user.html_url} target="_blank" rel="noopener noreferrer">
+                View Profile
+              </a>
+            </div>
+          ))}
         </div>
       )}
     </div>
