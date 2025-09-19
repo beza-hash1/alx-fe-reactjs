@@ -1,10 +1,10 @@
 import axios from 'axios'
 
+
 const api = axios.create({
   baseURL: 'https://api.github.com',
   timeout: 10000,
 })
-
 
 export async function fetchUserData(username) {
   if (!username) throw new Error('username-required')
@@ -25,8 +25,14 @@ export async function fetchUserData(username) {
 }
 
 
- 
-export async function searchUsersAdvanced({ username, location, minRepos = 0, per_page = 12, page = 1 }) {
+
+export async function searchUsersAdvanced({
+  username,
+  location,
+  minRepos = 0,
+  per_page = 12,
+  page = 1,
+}) {
   if (!username) return []
 
   try {
@@ -49,4 +55,14 @@ export async function searchUsersAdvanced({ username, location, minRepos = 0, pe
       throw new Error(err.response.data.message)
     throw err
   }
+}
+
+
+export const searchUsers = searchUsersAdvanced
+
+
+export default {
+  fetchUserData,
+  searchUsersAdvanced,
+  searchUsers,
 }
