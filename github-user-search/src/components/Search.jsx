@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { fetchUserData } from "../services/githubService";
+import { searchUsers } from "../services/githubService";
 
 function Search() {
   const [username, setUsername] = useState("");
-  const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -13,17 +13,17 @@ function Search() {
 
     setLoading(true);
     setError("");
-    setUser(null);
+    setUsers([]);
 
     try {
-      const data = await fetchUserData(username);
-      setUser(data);
-    } catch (err) {
-      if (err.message === "Not Found") {
-        setError("Looks like we can’t find the user.");
+      const data = await searchUsers({ username }); // returns an array
+      if (data.length === 0) {
+        setError("Looks like we can’t find any users.");
       } else {
-        setError("Something went wrong. Please try again.");
+        setUsers(data);
       }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -54,26 +54,32 @@ function Search() {
       {/* Error Message */}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* User Info */}
-      {user && (
-        <div className="p-4 border rounded-lg shadow">
-          <img
-            src={user.avatar_url}
-            alt={user.login}
-            className="w-20 h-20 rounded-full mx-auto"
-          />
-          <h2 className="text-lg font-bold text-center mt-2">{user.login}</h2>
-          {user.name && <p className="text-center">{user.name}</p>}
-          <a
-            href={user.html_url}
-            target="_blank"
-            rel="noreferrer"
-            className="block text-blue-500 text-center mt-2"
+      {/* Users List */}
+      <div className="grid grid-cols-1 gap-4">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="p-4 border rounded-lg shadow flex items-center gap-4"
           >
-            View Profile
-          </a>
-        </div>
-      )}
+            <img
+              src={user.avatar_url}
+              alt={user.login}
+              className="w-12 h-12 rounded-full"
+            />
+            <div>
+              <h2 className="font-bold">{user.login}</h2>
+              <a
+                href={user.html_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-500"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
