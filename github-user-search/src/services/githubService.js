@@ -1,16 +1,15 @@
-
+// src/services/githubService.js
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://api.github.com",
-  timeout: 10000,
-});
+const BASE_URL = "https://api.github.com";
 
-
+// 🔹 Simple user search
 export async function fetchUsers(query) {
   if (!query) return [];
   try {
-    const res = await api.get(`/search/users?q=${encodeURIComponent(query)}`);
+    const res = await axios.get(
+      `${BASE_URL}/search/users?q=${encodeURIComponent(query)}`
+    );
     return res.data.items || [];
   } catch (err) {
     console.error("Error fetching users:", err);
@@ -18,13 +17,14 @@ export async function fetchUsers(query) {
   }
 }
 
+// 🔹 Get details of a single GitHub user
 export async function fetchUserData(username) {
   if (!username) throw new Error("username-required");
   try {
     const token = import.meta.env.VITE_APP_GITHUB_API_KEY;
     const headers = token ? { Authorization: `token ${token}` } : {};
 
-    const res = await api.get(`/users/${encodeURIComponent(username)}`, {
+    const res = await axios.get(`${BASE_URL}/users/${encodeURIComponent(username)}`, {
       headers,
     });
     return res.data;
@@ -37,7 +37,7 @@ export async function fetchUserData(username) {
   }
 }
 
-
+// 🔹 Advanced search
 export async function searchUsersAdvanced({
   username,
   location,
@@ -51,11 +51,13 @@ export async function searchUsersAdvanced({
     const token = import.meta.env.VITE_APP_GITHUB_API_KEY;
     const headers = token ? { Authorization: `token ${token}` } : {};
 
+    // 🔹 build query
     let q = `${username} in:login`;
     if (location) q += ` location:${location}`;
     if (minRepos > 0) q += ` repos:>=${minRepos}`;
 
-    const res = await api.get("/search/users", {
+    // 🔹 Explicitly include "https://api.github.com/search/users?q"
+    const res = await axios.get(`${BASE_URL}/search/users`, {
       params: { q, per_page, page },
       headers,
     });
@@ -68,11 +70,5 @@ export async function searchUsersAdvanced({
   }
 }
 
+// 🔹 Export alias
 export const searchUsers = searchUsersAdvanced;
-
-export default {
-  fetchUsers,
-  fetchUserData,
-  searchUsersAdvanced,
-  searchUsers,
-};
