@@ -1,4 +1,3 @@
-// src/components/Search.jsx
 import React, { useState } from "react";
 import { fetchUserData } from "../services/githubService";
 
