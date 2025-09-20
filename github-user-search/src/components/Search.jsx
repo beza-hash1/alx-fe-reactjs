@@ -1,100 +1,82 @@
-import React, { useState } from 'react'
-import { searchUsersAdvanced } from '../services/githubService'
+// src/components/Search.jsx
+import React, { useState } from "react";
+import { fetchUserData } from "../services/githubService";
 
-export default function Search() {
-  const [username, setUsername] = useState('')
-  const [location, setLocation] = useState('')
-  const [minRepos, setMinRepos] = useState(0)
-  const [users, setUsers] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+function Search() {
+  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  async function submit(e) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setUsers([])
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!username.trim()) return;
 
-    if (!username.trim()) {
-      setError('Please enter a username')
-      setLoading(false)
-      return
-    }
+    setLoading(true);
+    setError("");
+    setUser(null);
 
     try {
-      const results = await searchUsersAdvanced({
-        username,
-        location,
-        minRepos: Number(minRepos),
-        per_page: 12,
-      })
-
-      if (results.length === 0) {
-        setError('Looks like we cant find any users')
-      } else {
-        setUsers(results)
-      }
+      const data = await fetchUserData(username);
+      setUser(data);
     } catch (err) {
-      setError(err.message || 'Looks like we cant find any users')
+      if (err.message === "Not Found") {
+        setError("Looks like we can’t find the user.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  function clearAll() {
-    setUsername('')
-    setLocation('')
-    setMinRepos(0)
-    setUsers([])
-    setError(null)
-  }
+  };
 
   return (
-    <div>
-      <form onSubmit={submit} className="search-form" role="search">
+    <div className="p-6 max-w-md mx-auto">
+      {/* Search Form */}
+      <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Enter GitHub username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          aria-label="Username"
+          className="flex-1 px-3 py-2 border rounded-lg"
         />
-        <input
-          type="text"
-          placeholder="Location (optional)"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          aria-label="Location"
-        />
-        <input
-          type="number"
-          placeholder="Min Repos"
-          value={minRepos}
-          onChange={(e) => setMinRepos(e.target.value)}
-          aria-label="Minimum repositories"
-          min="0"
-        />
-        <button type="submit">Search</button>
-        <button type="button" onClick={clearAll}>Clear</button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          Search
+        </button>
       </form>
 
-      {loading && <p>Loading...</p>}
-      {error && <p className="error">{error}</p>}
+      {/* Loading State */}
+      {loading && <p className="text-gray-500">Loading...</p>}
 
-      {users.length > 0 && (
-        <div className="users-grid">
-          {users.map((user) => (
-            <div key={user.id} className="user-card">
-              <img src={user.avatar_url} alt={`${user.login} avatar`} width="100" />
-              <h3>{user.login}</h3>
-              <p>Type: {user.type}</p>
-              <a href={user.html_url} target="_blank" rel="noopener noreferrer">
-                View Profile
-              </a>
-            </div>
-          ))}
+      {/* Error Message */}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {/* User Info */}
+      {user && (
+        <div className="p-4 border rounded-lg shadow">
+          <img
+            src={user.avatar_url}
+            alt={user.login}
+            className="w-20 h-20 rounded-full mx-auto"
+          />
+          <h2 className="text-lg font-bold text-center mt-2">{user.login}</h2>
+          {user.name && <p className="text-center">{user.name}</p>}
+          <a
+            href={user.html_url}
+            target="_blank"
+            rel="noreferrer"
+            className="block text-blue-500 text-center mt-2"
+          >
+            View Profile
+          </a>
         </div>
       )}
     </div>
-  )
+  );
 }
+
+export default Search;
