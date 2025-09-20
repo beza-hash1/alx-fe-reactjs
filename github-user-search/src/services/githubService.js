@@ -6,6 +6,7 @@ const api = axios.create({
   timeout: 10000,
 })
 
+
 export async function fetchUserData(username) {
   if (!username) throw new Error('username-required')
   try {
@@ -23,7 +24,6 @@ export async function fetchUserData(username) {
     throw err
   }
 }
-
 
 
 export async function searchUsersAdvanced({
@@ -44,6 +44,7 @@ export async function searchUsersAdvanced({
     if (location) q += ` location:${location}`
     if (minRepos > 0) q += ` repos:>=${minRepos}`
 
+    
     const res = await api.get('/search/users', {
       params: { q, per_page, page },
       headers,
@@ -59,7 +60,6 @@ export async function searchUsersAdvanced({
 
 
 export const searchUsers = searchUsersAdvanced
-
 
 export default {
   fetchUserData,
