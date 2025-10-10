@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "react-query";
-import PostsComponent from "./components/PostsComponent";
+import PostsComponent from "./components/PostsComponent"; // <-- exact path
 
 const queryClient = new QueryClient();
 

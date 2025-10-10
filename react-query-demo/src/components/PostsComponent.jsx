@@ -14,6 +14,8 @@ function PostsComponent() {
   const { data, error, isLoading, isError, refetch } = useQuery("posts", fetchPosts, {
     staleTime: 60000,
     cacheTime: 300000,
+    refetchOnWindowFocus: false,  // <-- prevents auto-refetch when window gains focus
+    keepPreviousData: true,       // <-- keeps previous data while fetching new
   });
 
   if (!showPosts) return <button onClick={() => setShowPosts(true)}>Show Posts</button>;
