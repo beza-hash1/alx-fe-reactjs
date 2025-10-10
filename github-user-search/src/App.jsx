@@ -1,16 +1,13 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
-import Home from './components/Home'
-import About from './components/About'
+import Search from './components/Search'
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-      </Route>
-    </Routes>
+    <div className="min-h-screen p-4">
+      <h1 className="text-4xl font-bold text-center text-blue-600 mb-6">
+        GitHub User Search
+      </h1>
+      <Search />
+    </div>
   )
 }
