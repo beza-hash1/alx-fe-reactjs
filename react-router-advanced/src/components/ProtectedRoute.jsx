@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children }) {
-  const isAuthenticated = false; // Simulate login: set true to allow access
+  const isAuthenticated = false; // set true to simulate login
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
