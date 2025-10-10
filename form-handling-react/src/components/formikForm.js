@@ -1,3 +1,5 @@
+/** @jsxImportSource react */
+import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -7,7 +9,9 @@ function FormikForm() {
   const validationSchema = Yup.object({
     username: Yup.string().required("Username is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -19,7 +23,11 @@ function FormikForm() {
   return (
     <div style={{ maxWidth: "400px", margin: "40px auto" }}>
       <h2>User Registration (Formik + Yup)</h2>
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+      >
         <Form>
           <div style={{ marginBottom: "10px" }}>
             <label>Username:</label><br />

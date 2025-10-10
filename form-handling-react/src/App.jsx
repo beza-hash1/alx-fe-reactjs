@@ -1,5 +1,5 @@
-import RegistrationForm from "./components/RegistrationForm";
-import FormikForm from "./components/formikForm";
+  import RegistrationForm from "./components/RegistrationForm";
+import FormikForm from "./components/formikForm.js"; // matches file name
 
 function App() {
   return (
@@ -12,3 +12,4 @@ function App() {
 }
 
 export default App;
+
